@@ -10,29 +10,27 @@ conexao=mysql.connector.connect(
 cursor=conexao.cursor()
 
 class Usuario:
-    def __init__(self, nome, email, ids, senha):
+    def __init__(self, nome, email, senha):
         self.nome = nome
         self.email = email
-        self.ids = ids
         self.senha = senha
 
     def cadastro(self, cursor, conexao):
-        cursor.execute("SELECT * FROM usuarios WHERE email = %s", (self.email))
+        cursor.execute("SELECT * FROM usuario WHERE email = %s", (self.email,))
+
         if cursor.fetchone():
             print("Já existe um usuário com este email.")
             return
         
-        cursor.execute 
-        ("INSERT INTO usuarios(nome, email, senha) VALUES (%s, %s, %s)", 
-        (self.nome, self.email, self.senha)
-        )
+        cursor.execute(
+        "INSERT INTO usuario(nome, email, senha) VALUES (%s, %s, %s)",  (self.nome, self.email, self.senha))
 
         conexao.commit()
         print(f"{self.nome} cadastrado com sucesso")
 
     def login(self,cursor):
         cursor.execute(
-            "SELECT nome FROM usuarios WHERE email = %s AND senha = %s",
+            "SELECT nome FROM usuario WHERE email = %s AND senha = %s",
             (self.nome, self.senha)
         )
         resultado = cursor.fetchone()
@@ -44,3 +42,34 @@ class Usuario:
         else:
             print("E-mail ou senha incorretos")
             return False
+        
+while True:
+    print("/n===MENU===")
+    print("1 - Cadastrar usuário.")
+    print("2 - Fazer login.")
+    print("3 - Sair")
+    opcao = input("Insira uma opcao de 1 a 3: ")
+
+    if opcao == "1":
+        nome = input("Digite seu nome: ")
+        email = input("Digite seu email: ")
+        senha = int(input("Digite sua senha: "))
+        usuario = Usuario(nome, email, senha)
+        usuario.cadastro(cursor, conexao)
+    
+    elif opcao == '2':
+        email = input("Digite seu email: ")
+        senha = int(input("Digite sua senha: "))
+        usuario = Usuario("", email, senha)
+        usuario.login(cursor)
+
+    elif opcao == '3':
+        cursor.close()
+        conexao.close()
+        print("Encerrando sistema...")
+        break
+
+    else:
+        print("Opcao invalida.")
+
+
